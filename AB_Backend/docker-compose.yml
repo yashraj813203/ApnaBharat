@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  ab_db:
+    image: postgres:16-alpine
+    container_name: ab_db
+    environment:
+      POSTGRES_DB: ab_db
+      POSTGRES_USER: ab_user
+      POSTGRES_PASSWORD: ab_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ab_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ab_user -d ab_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - ab_net
+
+  ab_redis:
+    image: redis:7-alpine
+    container_name: ab_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ab_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - ab_net
+
+  ab_backend:
+    container_name: ab_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://ab_db:5432/ab_db
+      DB_USERNAME: ab_user
+      DB_PASSWORD: ab_pass
+      REDIS_URL: redis://ab_redis:6379
+    depends_on:
+      ab_db:
+        condition: service_healthy
+      ab_redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - ab_net
+
+volumes:
+  ab_pgdata:
+  ab_redisdata:
+
+networks:
+  ab_net:
+    driver: bridge

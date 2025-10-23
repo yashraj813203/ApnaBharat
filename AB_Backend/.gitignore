@@ -1,0 +1,71 @@
+###############################
+# Maven Build
+###############################
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+###############################
+# IDE & Editor Files
+###############################
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse / STS
+.project
+.classpath
+.factorypath
+.settings/
+.sts4-cache/
+
+# VS Code
+.vscode/
+
+###############################
+# System Files
+###############################
+.DS_Store
+Thumbs.db
+
+###############################
+# Logs & Temp Files
+###############################
+*.log
+*.tmp
+*.swp
+*.swo
+
+###############################
+# Docker & Local Volumes
+###############################
+ab_pgdata/
+ab_redisdata/
+docker-compose.override.yml
+
+###############################
+# Credentials (optional)
+###############################
+.env
+*.env
+*.pem
+*.key
+*.crt
+*.p12
+
+###############################
+# Test Reports
+###############################
+/surefire-reports/
+/failsafe-reports/
+/jacoco.exec
+
+###############################
+# OS-specific
+###############################
+ehthumbs.db
+Icon?
+Desktop.ini

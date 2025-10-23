@@ -1,0 +1,14 @@
+# Ignore everything not needed inside container
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+.DS_Store
+docker-compose.yml
+docker-compose.override.yml
+ab_pgdata/
+ab_redisdata/
+*.log
+*.tmp
+*.swp
