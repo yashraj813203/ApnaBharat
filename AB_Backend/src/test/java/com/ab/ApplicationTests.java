@@ -6,11 +6,11 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@EnableAutoConfiguration(exclude = {HibernateJpaAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = { HibernateJpaAutoConfiguration.class })
 class ApplicationTests {
 
-    @Test
-    void contextLoads() {
-        // Simple context load check without DB
-    }
+	@Test
+	void contextLoads() {
+		// Simple context load check without DB
+	}
 }
