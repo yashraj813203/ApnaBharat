@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,15 +13,16 @@ import java.util.UUID;
 @Setter
 @MappedSuperclass
 public abstract class BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	private UUID id;
 
-	@CreationTimestamp
-	@Column(nullable = false, updatable = false)
-	private Instant createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-	@UpdateTimestamp
-	@Column(nullable = false)
-	private Instant updatedAt;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private Instant updatedAt;
 }

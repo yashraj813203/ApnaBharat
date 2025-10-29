@@ -1,43 +1,52 @@
 package com.ab.config;
 
-import com.ab.service.ApiIngestionService;
+import com.ab.requestDto.MgnregaApiFilterRequestDto;
 import com.ab.service.MgnregaDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
-import static com.ab.util.Constants.SOURCE_MGNREGA;
 
 @Slf4j
-@Component
+@Configuration
 @EnableScheduling
 @RequiredArgsConstructor
 public class SchedulerConfig {
 
     private final MgnregaDataService mgnregaDataService;
-    private final ApiIngestionService ingestionService;
 
-    // Runs once every 24 hours
-    @Scheduled(cron = "0 0 2 * * ?") // 2:00 AM daily
-    public void refreshMgnregaData() {
+    @Value("${mgnrega.api.base-url}")
+    private String baseUrl;
 
-        log.info("Scheduler triggered", SOURCE_MGNREGA);
+    @Value("${mgnrega.api.resource-id}")
+    private String resourceId;
 
-        // ✅ Step 1: Check if ingestion is already running
-        if (ingestionService.isIngestionRunning(SOURCE_MGNREGA)) {
-            log.warn("Previous ingestion still RUNNING — skipping this scheduled execution.");
-            return;
-        }
+    @Value("${mgnrega.api.api-key}")
+    private String apiKey;
 
-        // ✅ Step 2: Safe to start a new ingestion
-        try {
-            log.info("Scheduled MGNREGA data refresh started...");
-            mgnregaDataService.refreshAllData();
-            log.info("Scheduled MGNREGA data refresh completed.");
-        } catch (Exception e) {
-            log.error("Scheduled ingestion failed", SOURCE_MGNREGA, e.getMessage());
-        }
+    @Value("${mgnrega.api.format:json}")
+    private String format;
+
+    @Value("${mgnrega.api.limit:10}")
+    private int limit;
+
+    // 🕒 Run every 12 hours (adjust as needed)
+    @Scheduled(cron = "0 0 */12 * * *")
+    public void scheduledDataRefresh() {
+        log.info("🕓 Scheduled MGNREGA data refresh triggered...");
+
+        MgnregaApiFilterRequestDto req = MgnregaApiFilterRequestDto.builder()
+                .apiKey(apiKey)
+                .format(format)
+                .limit(limit)
+                .offset(0)
+                .stateName("Madhya Pradesh")  // ✅ optional example
+                .finYear("2024-2025")        // ✅ example
+                .build();
+
+        log.info("🌍 Sending request to refresh MGNREGA data from configured API...");
+        mgnregaDataService.refreshDataFromGovApi(req);
     }
 }

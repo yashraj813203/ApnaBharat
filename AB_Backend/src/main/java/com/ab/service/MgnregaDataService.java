@@ -1,34 +1,28 @@
 package com.ab.service;
 
-import com.ab.requestDto.MgnregaMonthlyStatRequestDto;
+import com.ab.requestDto.MgnregaApiFilterRequestDto;
 import com.ab.responseDto.MgnregaMonthlyStatResponseDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 public interface MgnregaDataService {
 
-	/**
-	 * Save or update a monthly MGNREGA record for a district.
-	 */
-	void saveOrUpdateMonthlyStat(MgnregaMonthlyStatRequestDto dto);
+    /**
+     * Fetches data from Government API based on filters and stores new records in DB.
+     */
+    void refreshDataFromGovApi(MgnregaApiFilterRequestDto filterRequest);
 
-	/**
-	 * Fetch paginated stats filtered by state name.
-	 */
-	Page<MgnregaMonthlyStatResponseDto> getStatsByState(String stateName, Pageable pageable);
+    /**
+     * Returns latest data for a specific district.
+     */
+    List<MgnregaMonthlyStatResponseDto> getLatestDataByDistrict(String districtName);
 
-	/**
-	 * Fetch paginated stats filtered by district name.
-	 */
-	Page<MgnregaMonthlyStatResponseDto> getStatsByDistrict(String districtName, Pageable pageable);
+    /**
+     * Returns filtered data (by state, district, fin year) — for user filters in UI.
+     */
+    List<MgnregaMonthlyStatResponseDto> getFilteredData(String stateName, String districtName, String finYear, int page, int size);
 
-	/**
-	 * Refresh and re-ingest all data from external API.
-	 */
-	void refreshAllData();
-
-	/**
-	 * Get total record count (for dashboard display).
-	 */
-	long countAllRecords();
+    /**
+     * Counts total records in our database.
+     */
+    long countAllRecords();
 }

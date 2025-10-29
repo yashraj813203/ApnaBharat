@@ -1,72 +1,74 @@
 package com.ab.controller;
 
-import com.ab.responseDto.MgnregaMonthlyStatResponseDto;
+import com.ab.requestDto.MgnregaApiFilterRequestDto;
 import com.ab.service.MgnregaDataService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "MGNREGA Data APIs", description = "Fetch and refresh district/state-wise performance data")
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/mgnrega")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/mgnrega")
 public class MgnregaController {
 
     private final MgnregaDataService mgnregaDataService;
 
-    // ------------------------------------------
-    // 1️⃣ Fetch paginated stats by State
-    // ------------------------------------------
-    @Operation(summary = "Get MGNREGA statistics by State name", description = "Fetch paginated monthly data for a given state.")
-    @GetMapping("/state/{stateName}")
-    public ResponseEntity<Page<MgnregaMonthlyStatResponseDto>> getByState(
-            @PathVariable String stateName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    @Value("${mgnrega.api.base-url}")
+    private String baseUrl;
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<MgnregaMonthlyStatResponseDto> response = mgnregaDataService.getStatsByState(stateName, pageable);
-        return ResponseEntity.ok(response);
-    }
+    @Value("${mgnrega.api.resource-id}")
+    private String resourceId;
 
-    // ------------------------------------------
-    // 2️⃣ Fetch paginated stats by District
-    // ------------------------------------------
-    @Operation(summary = "Get MGNREGA statistics by District name", description = "Fetch paginated monthly data for a given district.")
-    @GetMapping("/district/{districtName}")
-    public ResponseEntity<Page<MgnregaMonthlyStatResponseDto>> getByDistrict(
-            @PathVariable String districtName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    @Value("${mgnrega.api.api-key}")
+    private String apiKey;
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<MgnregaMonthlyStatResponseDto> response = mgnregaDataService.getStatsByDistrict(districtName, pageable);
-        return ResponseEntity.ok(response);
-    }
+    @Value("${mgnrega.api.format:json}")
+    private String format;
 
-    // ------------------------------------------
-    // 3️⃣ Refresh Data (calls API ingestion)
-    // ------------------------------------------
-    @Operation(summary = "Refresh MGNREGA data", description = "Fetches and updates latest data from government Open API.")
+    @Value("${mgnrega.api.limit:10}")
+    private int limit;
+
+
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshData() {
-        mgnregaDataService.refreshAllData();
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body("🟢 Data refresh started — check ingestion logs for status.");
+        log.info("🛰️ Starting MGNREGA data refresh using environment configuration...");
+
+        MgnregaApiFilterRequestDto req = MgnregaApiFilterRequestDto.builder()
+                .baseUrl(baseUrl)
+                .resourceId(resourceId)
+                .apiKey(apiKey)
+                .format(format)
+                .limit(limit)
+                .offset(0)
+                .stateName("MADHYA PRADESH")        // ✅ try this one
+                .finYear("2024-2025")     // ✅ available year
+                .build();
+
+
+        mgnregaDataService.refreshDataFromGovApi(req);
+        return ResponseEntity.ok("✅ Data refresh started successfully.");
     }
 
-    // ------------------------------------------
-    // 4️⃣ Count all records (for dashboard summary)
-    // ------------------------------------------
-    @Operation(summary = "Get total records", description = "Returns total number of MGNREGA records stored in database.")
-    @GetMapping("/count")
-    public ResponseEntity<Long> countRecords() {
-        return ResponseEntity.ok(mgnregaDataService.countAllRecords());
+
+    // Example: fetch filtered data
+    @GetMapping("/filter")
+    public ResponseEntity<?> getFilteredData(
+            @RequestParam(required = false) String stateName,
+            @RequestParam(required = false) String districtName,
+            @RequestParam(required = false) String finYear,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(
+                mgnregaDataService.getFilteredData(stateName, districtName, finYear, page, size)
+        );
+    }
+
+    @GetMapping("/district/{name}")
+    public ResponseEntity<?> getLatestDistrictData(@PathVariable String name) {
+        return ResponseEntity.ok(mgnregaDataService.getLatestDataByDistrict(name));
     }
 }

@@ -1,34 +1,48 @@
 package com.ab.responseDto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class MgnregaMonthlyStatResponseDto {
 
-	private String stateName;
-	private String stateCode;
-	private String districtName;
-	private String districtCode;
+    private String stateName;
+    private String stateCode;
+    private String districtName;
+    private String districtCode;
+    private String financialYear;
+    private String monthName;
 
-	private Integer monthNo;
-	private String monthName; // for display convenience ("April", "May", etc.)
-	private String financialYear;
-
-	private Long householdsDemanded;
-	private Long householdsProvided;
-	private Long personsDemanded;
-	private Long personsProvided;
-	private Long persondaysGenerated;
-
-	private BigDecimal avgWageRate;
-	private BigDecimal totalExpenditure;
-	private Long worksCompleted;
-	private BigDecimal scShare;
-	private BigDecimal stShare;
-	private BigDecimal womenShare;
+    private Long approvedLabourBudget;
+    private BigDecimal averageWageRate;
+    private Long averageDaysOfEmployment;
+    private Long differentlyAbledPersonsWorked;
+    private BigDecimal materialAndSkilledWages;
+    private Long numberOfCompletedWorks;
+    private Long numberOfGPsWithNilExp;
+    private Long numberOfOngoingWorks;
+    private Long persondaysCentralLiability;
+    private Long scPersondays;
+    private Long scWorkersAgainstActiveWorkers;
+    private Long stPersondays;
+    private Long stWorkersAgainstActiveWorkers;
+    private BigDecimal totalAdminExpenditure;
+    private BigDecimal totalExpenditure;
+    private Long totalHouseholdsWorked;
+    private Long totalIndividualsWorked;
+    private Long totalActiveJobcards;
+    private Long totalActiveWorkers;
+    private Long totalHHsCompleted100Days;
+    private Long totalJobcardsIssued;
+    private Long totalWorkers;
+    private Long totalWorksTakenUp;
+    private BigDecimal wages;
+    private Long womenPersondays;
+    private BigDecimal percentCategoryBWorks;
+    private BigDecimal percentExpAgriAllied;
+    private BigDecimal percentNrmExpenditure;
+    private BigDecimal percentPaymentsWithin15Days;
+    private String remarks;
 }

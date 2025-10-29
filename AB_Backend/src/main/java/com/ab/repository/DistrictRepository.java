@@ -12,9 +12,9 @@ import java.util.UUID;
 @Repository
 public interface DistrictRepository extends JpaRepository<District, UUID> {
 
-	Optional<District> findByDistrictCode(String districtCode);
+    Optional<District> findByDistrictCode(String districtCode);
 
-	List<District> findByState(State state);
+    List<District> findByState(State state);
 
-	boolean existsByDistrictCodeAndState(String districtCode, State state);
+    boolean existsByDistrictCode(String districtCode);
 }
